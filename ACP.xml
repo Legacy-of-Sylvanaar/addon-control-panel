@@ -175,7 +175,7 @@
             <!--</OnClick>-->
         <!--</Scripts>-->
     <!--</Button>-->
-    <Frame name="ACP_AddonList" hidden="true" toplevel="true" enableMouse="true" moveable="true" enableKeyboard="false">
+    <Frame name="ACP_AddonList" hidden="true" toplevel="true" enableMouse="true" enableKeyboard="false">
         <Size>
             <AbsDimension x="640" y="512"/>
         </Size>
