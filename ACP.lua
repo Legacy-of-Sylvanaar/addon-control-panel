@@ -722,16 +722,17 @@ function ACP:ResolveLibraryName(id)
     return name
 end
 
-
+local ACP_NOCHILDREN = "nochildren"
 local ACP_NORECURSE = "norecurse"
 
 local ACP_ADD_SET_D = "addset"
 local ACP_REM_SET_D = "removeset"
+local ACP_LOAD_SET_D = "loadset"
 local ACP_DISABLEALL = "disableall"
 
 local ACP_RESTOREDEFAULT = "default"
 
-local ACP_COMMANDS = { ACP_NOCHILDREN, ACP_NORECURSE, ACP_ADD_SET_D, ACP_REM_SET_D, ACP_DISABLEALL, ACP_RESTOREDEFAULT }
+local ACP_COMMANDS = { ACP_NOCHILDREN, ACP_NORECURSE, ACP_ADD_SET_D, ACP_REM_SET_D, ACP_LOAD_SET_D, ACP_DISABLEALL, ACP_RESTOREDEFAULT }
 
 function ACP.SlashHandler(msg)
     if type(msg) == "string" and msg:len() > 0 then
@@ -768,6 +769,17 @@ function ACP.SlashHandler(msg)
 
             if type(set) == "number" then
                 ACP:UnloadSet(set)
+                return
+            end
+        end
+
+        if msg:find("^"..ACP_LOAD_SET_D) then
+            local set = msg:sub(ACP_LOAD_SET_D:len(), -1):match("%d+")
+            set = tonumber(set)
+
+            if type(set) == "number" then
+                ACP:DisableAll_OnClick()
+                ACP:LoadSet(set)
                 return
             end
         end
