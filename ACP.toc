@@ -1,4 +1,4 @@
-## Interface: 100000
+## Interface: 100100
 
 
 ## Title: Addon Control Panel

@@ -17,6 +17,11 @@ ACP.TAGS = {
 	CHILD_OF = "X-Child-Of",
 }
 
+local function GetAddOnMetadata(name, tag)
+    local retOK, ret1 = pcall(C_AddOns.GetAddOnMetadata, name, tag)
+    if (retOK) then return ret1 end
+end
+
 -- Handle various annoying special case names
 function ACP:SpecialCaseName(name)
     local partof = GetAddOnMetadata(name, ACP.TAGS.PART_OF)
@@ -2011,7 +2016,8 @@ function ACP:ShowTooltip(this, index)
     end
 
     --UpdateAddOnMemoryUsage()
-    local mem = GetAddOnMemoryUsage(index)
+    local retOK, ret1 = pcall(GetAddOnMemoryUsage, index)
+    local mem = retOK and ret1 or 0
     local text2
     if mem > 1024 then
         text2 = ("|cff8080ff%.2f|r MiB"):format(mem / 1024)
