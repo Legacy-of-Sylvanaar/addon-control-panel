@@ -298,8 +298,6 @@ function ACP:GetAddonCompatibilitySummary(addon)
 end
 
 function ACP:GetAddonStatus(addon)
-    local addon = addon
-
     -- Hi, i'm Mr Kludge! Whats your name?
     local addonnum = tonumber(addon)
     if addonnum and (addonnum == 0 or addonnum > GetNumAddOns()) then
@@ -714,7 +712,7 @@ end
 
 
 function ACP:ResolveLibraryName(id)
-    local a, name
+    local name
     for a=1,GetNumAddOns() do
         local n = GetAddOnInfo(a)
         if n == id then
@@ -878,10 +876,10 @@ addonListBuilders[ACE2] = function()
     local currPos = list
     for i,addon in ipairs(t) do
         if type(addon) == 'string' then
-            local t = {}
-            t.category = addon
-            table.insert(list, t)
-            currPos = t
+            local t_ = {}
+            t_.category = addon
+            table.insert(list, t_)
+            currPos = t_
         else
             table.insert(currPos, addon)
         end
@@ -939,10 +937,10 @@ addonListBuilders[AUTHOR] = function()
     local currPos = list
     for i,addon in ipairs(t) do
         if type(addon) == 'string' then
-            local t = {}
-            t.category = addon
-            table.insert(list, t)
-            currPos = t
+            local t_ = {}
+            t_.category = addon
+            table.insert(list, t_)
+            currPos = t_
         else
             table.insert(currPos, addon)
         end
@@ -1009,13 +1007,13 @@ addonListBuilders[GROUP_BY_NAME] = function()
         if nameA:find("_") then
             catA, nameA = strsplit("_", nameA)
         else
-            catA, nameA = nameA
+            catA, nameA = nameA, nil
         end
 
         if nameB:find("_") then
             catB, nameB = strsplit("_", nameB)
         else
-            catB, nameB = nameB
+            catB, nameB = nameB, nil
         end
 
         if catA:lower() == catB:lower() then
@@ -1074,15 +1072,15 @@ addonListBuilders[GROUP_BY_NAME] = function()
             if addon == "" then
                 currPos = list
             else
-                local t = {}
-                t.category = addon
+                local t_ = {}
+                t_.category = addon
                 --    			table.remove(currPos, #currPos)
                 local addonpos = currPos[#currPos]
                 if addonpos then
                     local addonname = ACP:SpecialCaseName(GetAddOnInfo(addonpos))
                     if (addonname == addon) then table.remove(currPos, #currPos) end
-                    table.insert(list, t)
-                    currPos = t
+                    table.insert(list, t_)
+                    currPos = t_
                 end
             end
         else
@@ -1338,14 +1336,14 @@ function ACP:LoadSet(set)
 end
 
 function ACP:IsAddOnProtected(addon)
-    local addon = GetAddOnInfo(addon)
+    addon = GetAddOnInfo(addon)
     if addon and savedVar.ProtectedAddons then
         return savedVar.ProtectedAddons[addon]
     end
 end
 
 function ACP:Security_OnClick(addon)
-    local addon = GetAddOnInfo(addon)
+    addon = GetAddOnInfo(addon)
     if addon then
         savedVar.ProtectedAddons = savedVar.ProtectedAddons or {
             ["ACP"] = true
@@ -1462,7 +1460,6 @@ function ACP:DisableAllAddons()
         EnableAddOn(k, UnitName("player"))
     end
     ACP:Print("Disabled all addons (except ACP & protected)")
-    
     if _G[ACP_FRAME_NAME]:IsShown() then
         self:AddonList_OnShow()
     end
@@ -1571,7 +1568,7 @@ function ACP:AddonList_OnShow_Fast(this)
     local origNumAddons = GetNumAddOns()
     local numAddons = #sortedAddonList
     FauxScrollFrame_Update(ACP_AddonList_ScrollFrame, numAddons, ACP_MAXADDONS, ACP_LINEHEIGHT, nil, nil, nil)
-    local i
+
     local offset = FauxScrollFrame_GetOffset(ACP_AddonList_ScrollFrame)
     local curr_category = ""
     for i=1,ACP_MAXADDONS,1 do
@@ -1645,7 +1642,7 @@ function ACP:AddonList_OnShow_Fast(this)
                 if collapsedAddons[obj.category] then
                     local t = self:GetAddonCategoryTable(obj.category)
                     subCount = t and #t
-                end 
+                end
 
                 local  name, title, notes, loadable, reason, security, newVersion
                 if (addonIdx > origNumAddons) then
@@ -1789,9 +1786,9 @@ function ACP:SetDropDown_Populate(level)
 
     if level == 1 then
 
-        local info, count, name
+        local info, count
         for i=1,ACP_SET_SIZE do
-            local name = nil
+            local name
 
             info = UIDropDownMenu_CreateInfo()
             if savedVar.AddonSet and savedVar.AddonSet[i] then
@@ -1987,13 +1984,13 @@ function ACP:ShowTooltip(this, index)
     if GetAddOnOptionalDependencies then
         local optionalDeps = { GetAddOnOptionalDependencies(name) }
         if #optionalDeps > 0 then
-            local dep = optionalDeps[1]
-            if dep then
-                depLine = CLR:Label(L["Embeds"]) .. ": " .. CLR:AddonStatus(dep, dep)
+            local dep_ = optionalDeps[1]
+            if dep_ then
+                depLine = CLR:Label(L["Embeds"]) .. ": " .. CLR:AddonStatus(dep_, dep_)
                 for i=2,#optionalDeps do
-                    dep = optionalDeps[i]
-                    if dep and dep:len() > 0 then
-                        depLine = depLine .. ", " .. CLR:AddonStatus(dep, dep)
+                    dep_ = optionalDeps[i]
+                    if dep_ and dep_:len() > 0 then
+                        depLine = depLine .. ", " .. CLR:AddonStatus(dep_, dep_)
                     end
                 end
                 GameTooltip:AddLine(depLine, 1, 0.78, 0, 1)
@@ -2103,7 +2100,7 @@ local function enable_lod_dependants(addon)
     end
 
     for i=1,GetNumAddOns() do
-        local name, title, notes, loadable, reason, security, newVersion = GetAddOnInfo(i)
+        local name = GetAddOnInfo(i)
         local enabled = GetAddOnEnableState(UnitName("player"), GetAddOnInfo(name)) > 0;
         local isdep = find_iterate_over(addon_name, GetAddOnDependencies(name))
         local ondemand = IsAddOnLoadOnDemand(name)
@@ -2133,7 +2130,7 @@ function ACP_EnableRecurse(name, skip_children)
 
     end
 
-    if (type(name) == "string" and strlen(name) > 0) or 
+    if (type(name) == "string" and strlen(name) > 0) or
         (type(name) == "number" and name > 0) then
 
         EnableAddOn(name, UnitName("player"))
