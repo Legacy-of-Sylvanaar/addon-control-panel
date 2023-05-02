@@ -17,8 +17,10 @@ ACP.TAGS = {
 	CHILD_OF = "X-Child-Of",
 }
 
+local GetAddOnMetadata_Orig = C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+
 local function GetAddOnMetadata(name, tag)
-    local retOK, ret1 = pcall(C_AddOns.GetAddOnMetadata, name, tag)
+    local retOK, ret1 = pcall(GetAddOnMetadata_Orig, name, tag)
     if (retOK) then return ret1 end
 end
 
