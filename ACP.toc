@@ -1,7 +1,7 @@
 ## Interface: 100100
 ## Interface-Classic: 11403
 ## Interface-BCC: 20504
-## Interface-Wrath: 30401
+## Interface-Wrath: 30402
 
 ## Title: Addon Control Panel
 ## Author: Sylvanaar (Sylvaan - Zul'Jin/US-Horde)
