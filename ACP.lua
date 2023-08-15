@@ -17,6 +17,11 @@ ACP.TAGS = {
 	CHILD_OF = "X-Child-Of",
 }
 
+local isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
+local isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
+local isBCC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
+local isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
+
 local GetAddOnMetadata_Orig = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 
 local function GetAddOnMetadata(name, tag)
@@ -265,11 +270,17 @@ function ACP:IsAddonCompatibleWithCurrentIntefaceVersion(addon)
         return true -- Get to the choppa!
     end
 
-    local max_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX) or
-        GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG)
+	local max_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or "")) or
+		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG) .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))
+	if not min_supported then
+	    max_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX) or GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG)
+	end
 
-    local min_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN) or
-        GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG)
+	local min_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or "")) or
+		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG) .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))
+	if not min_supported then
+	    min_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN) or GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG)
+	end
 
     --print("Min: "..tostring(min_supported).."  Max: "..tostring(max_supported))
 
