@@ -272,7 +272,7 @@ function ACP:IsAddonCompatibleWithCurrentIntefaceVersion(addon)
 
 	local max_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))) or
 		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG) .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))
-	if not min_supported then
+	if not max_supported then
 	    max_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX) or GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG)
 	end
 
