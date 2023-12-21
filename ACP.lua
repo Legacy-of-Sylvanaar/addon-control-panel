@@ -271,13 +271,13 @@ function ACP:IsAddonCompatibleWithCurrentIntefaceVersion(addon)
     end
 
 	local max_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))) or
-		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG) .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))
+		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or "")))
 	if not max_supported then
 	    max_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX) or GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG)
 	end
 
 	local min_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))) or
-		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG) .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""))
+		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG .. (isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or "")))
 	if not min_supported then
 	    min_supported = GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN) or GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MIN_ORG)
 	end
