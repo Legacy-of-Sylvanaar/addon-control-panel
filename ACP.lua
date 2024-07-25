@@ -22,7 +22,7 @@ local isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
 local isBCC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
 local isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
 
-local GetAddOnMetadata_Orig = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+local GetAddOnMetadata_Orig = C_AddOns and C_AddOns.GetAddOnMetadata
 
 local function GetAddOnMetadata(name, tag)
     local retOK, ret1 = pcall(GetAddOnMetadata_Orig, name, tag)
@@ -175,8 +175,8 @@ ACP.masterAddonList = masterAddonList
 
 	- If type(addonIndex) == 'string', it will be shown in the panel as a category header.
 	- The collapse state will be retrieved from the saved variables: collapsedAddons.
-	- If addonIndex > GetNumAddOns(), it''s a Blizzard addon, the index references to ACP_BLIZZARD_ADDONS[addonIndex - GetNumAddOns()].
-	- otherwise, addonIndex is the index used in GetAddOnInfo().
+	- If addonIndex > C_AddOns.GetNumAddOns(), it''s a Blizzard addon, the index references to ACP_BLIZZARD_ADDONS[addonIndex - C_AddOns.GetNumAddOns()].
+	- otherwise, addonIndex is the index used in C_AddOns.GetAddOnInfo().
 
 	This list will be rebuilt whenever use expanded/collapsed a category, or when user changed the sorting criteria.
 
@@ -266,7 +266,7 @@ function ACP:IsAddonCompatibleWithCurrentIntefaceVersion(addon)
     local build = select(4, GetBuildInfo())
 
     local addonnum = tonumber(addon)
-    if not addonnum or (addonnum and (addonnum == 0 or addonnum > GetNumAddOns())) then
+    if not addonnum or (addonnum and (addonnum == 0 or addonnum > C_AddOns.GetNumAddOns())) then
         return true -- Get to the choppa!
     end
 
@@ -314,7 +314,7 @@ end
 function ACP:GetAddonStatus(addon)
     -- Hi, i'm Mr Kludge! Whats your name?
     local addonnum = tonumber(addon)
-    if addonnum and (addonnum == 0 or addonnum > GetNumAddOns()) then
+    if addonnum and (addonnum == 0 or addonnum > C_AddOns.GetNumAddOns()) then
         return -- Get to the choppa!
     end
 
@@ -327,16 +327,16 @@ function ACP:GetAddonStatus(addon)
     end
 
 
-    local name, title, notes, loadable, reason, security, newVersion = GetAddOnInfo(addon)
+    local name, title, notes, loadable, reason, security, newVersion = C_AddOns.GetAddOnInfo(addon)
 
     if reason == "MISSING" and type(addon) == "string" then
         addon = self:ResolveLibraryName(addon) or addon
     end
 
 
-    local loaded = IsAddOnLoaded(addon)
-    local isondemand = IsAddOnLoadOnDemand(addon)
-    local enabled = GetAddOnEnableState(UnitName("player"), addon) > 0;
+    local loaded = C_AddOns.IsAddOnLoaded(addon)
+    local isondemand = C_AddOns.IsAddOnLoadOnDemand(addon)
+    local enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), addon) > 0;
     local color, note
 
     if reason == "DISABLED" then color, note = "9d9d9d", getreason(reason) -- Grey
@@ -460,11 +460,11 @@ local function GetAddonIndex(addon, noerr)
     elseif type(addon) == 'string' then
         local addonIndex = ACP_BLIZZARD_ADDONS[addon]
         if addonIndex then
-            return addonIndex + GetNumAddOns()
+            return addonIndex + C_AddOns.GetNumAddOns()
         else
             if addon == "" then return nil end
-            for i=1,GetNumAddOns() do
-                local name = ACP:SpecialCaseName(GetAddOnInfo(i))
+            for i=1,C_AddOns.GetNumAddOns() do
+                local name = ACP:SpecialCaseName(C_AddOns.GetAddOnInfo(i))
                 if name:lower() == ACP:SpecialCaseName(addon):lower() then
                     return i
                 end
@@ -655,9 +655,9 @@ function ACP:OnEvent(this, event, arg1, arg2, arg3)
             savedVar.NoChildren = true
         end
 
-        for i=1,GetNumAddOns() do
-            if IsAddOnLoaded(i) then
-                local name = GetAddOnInfo(i)
+        for i=1,C_AddOns.GetNumAddOns() do
+            if C_AddOns.IsAddOnLoaded(i) then
+                local name = C_AddOns.GetAddOnInfo(i)
                 if name ~= ACP_ADDON_NAME then
                     table.insert(ACP_DefaultSet, name)
                 end
@@ -682,12 +682,12 @@ function ACP:OnEvent(this, event, arg1, arg2, arg3)
 
         local reloadRequired = false
         for k,v in pairs(savedVar.ProtectedAddons) do
-            local name, title, notes, loadable, reason, security, newVersion    = GetAddOnInfo(k)
-            local enabled = GetAddOnEnableState(UnitName("player"), name) > 0;
+            local name, title, notes, loadable, reason, security, newVersion    = C_AddOns.GetAddOnInfo(k)
+            local enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), name) > 0;
             if reason == 'MISSING' then
                 savedVar.ProtectedAddons[k] = nil
             elseif (not enabled) or enabled == 0 then
-                EnableAddOn(k, UnitName("player"))
+                C_AddOns.EnableAddOn(k, UnitName("player"))
                 reloadRequired = true
             end
 
@@ -727,8 +727,8 @@ end
 
 function ACP:ResolveLibraryName(id)
     local name
-    for a=1,GetNumAddOns() do
-        local n = GetAddOnInfo(a)
+    for a=1,C_AddOns.GetNumAddOns() do
+        local n = C_AddOns.GetAddOnInfo(a)
         if n == id then
             name = n
         elseif GetAddOnMetadata(a, "X-AceLibrary-" .. id) then
@@ -810,7 +810,7 @@ addonListBuilders[DEFAULT] = function()
     for k in pairs(masterAddonList) do
         masterAddonList[k] = nil
     end
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     for i=1,numAddons do
         table.insert(masterAddonList, i)
     end
@@ -824,15 +824,15 @@ addonListBuilders[TITLES] = function()
         masterAddonList[k] = nil
     end
 
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     for i=1,numAddons do
         table.insert(masterAddonList, i)
     end
 
     -- Sort the addon list by Ace2 Categories.
     table.sort(masterAddonList, function(a, b)
-        local _, nameA = GetAddOnInfo(a)
-        local _, nameB = GetAddOnInfo(b)
+        local _, nameA = C_AddOns.GetAddOnInfo(a)
+        local _, nameB = C_AddOns.GetAddOnInfo(b)
         return formattitle(nameA) < formattitle(nameB)
     end)
 
@@ -845,7 +845,7 @@ addonListBuilders[ACE2] = function()
 
     local t = {}
 
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     for i=1,numAddons do
         table.insert(t, i)
     end
@@ -855,8 +855,8 @@ addonListBuilders[ACE2] = function()
         local catA = GetAddOnMetadata(a, "X-Category")
         local catB = GetAddOnMetadata(b, "X-Category")
         if catA == catB then
-            local nameA = GetAddOnInfo(a)
-            local nameB = GetAddOnInfo(b)
+            local nameA = C_AddOns.GetAddOnInfo(a)
+            local nameB = C_AddOns.GetAddOnInfo(b)
             return nameA < nameB
         else
             return tostring(catA) < tostring(catB)
@@ -906,7 +906,7 @@ end
 addonListBuilders[AUTHOR] = function()
     local t = {}
 
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     for i=1,numAddons do
         table.insert(t, i)
     end
@@ -916,8 +916,8 @@ addonListBuilders[AUTHOR] = function()
         local catA = GetAddOnMetadata(a, "Author")
         local catB = GetAddOnMetadata(b, "Author")
         if catA == catB then
-            local nameA = GetAddOnInfo(a)
-            local nameB = GetAddOnInfo(b)
+            local nameA = C_AddOns.GetAddOnInfo(a)
+            local nameB = C_AddOns.GetAddOnInfo(b)
             return nameA < nameB
         else
             return tostring(catA) < tostring(catB)
@@ -967,7 +967,7 @@ addonListBuilders[SEPARATE_LOD_LIST] = function()
     for k in pairs(masterAddonList) do
         masterAddonList[k] = nil
     end
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     local name
 
     local lods = {}
@@ -979,8 +979,8 @@ addonListBuilders[SEPARATE_LOD_LIST] = function()
 
     local pos = 1
     for i=1,numAddons do
-        name = GetAddOnInfo(i)
-        if not IsAddOnLoadOnDemand(name) then
+        name = C_AddOns.GetAddOnInfo(i)
+        if not C_AddOns.IsAddOnLoadOnDemand(name) then
             table.insert(nonlods, i)
         else
             table.insert(lods, i)
@@ -1001,7 +1001,7 @@ end
 addonListBuilders[GROUP_BY_NAME] = function()
     local t = {}
 
-    local numAddons = GetNumAddOns()
+    local numAddons = C_AddOns.GetNumAddOns()
     for i=1,numAddons do
         table.insert(t, i)
     end
@@ -1011,8 +1011,8 @@ addonListBuilders[GROUP_BY_NAME] = function()
 
     -- Sort the addon list by Ace2 Categories.
     table.sort(t, function(a, b)
-        local nameA = GetAddOnInfo(a)
-        local nameB = GetAddOnInfo(b)
+        local nameA = C_AddOns.GetAddOnInfo(a)
+        local nameB = C_AddOns.GetAddOnInfo(b)
 
         local catA, catB
 
@@ -1045,7 +1045,7 @@ addonListBuilders[GROUP_BY_NAME] = function()
     local t2 = t
     t = {}
     for i,addonIndex in ipairs(t2) do
-        name = ACP:SpecialCaseName(GetAddOnInfo(addonIndex))
+        name = ACP:SpecialCaseName(C_AddOns.GetAddOnInfo(addonIndex))
 
         local acecategory = GetAddOnMetadata(addonIndex, "X-Category")
 
@@ -1091,7 +1091,7 @@ addonListBuilders[GROUP_BY_NAME] = function()
                 --    			table.remove(currPos, #currPos)
                 local addonpos = currPos[#currPos]
                 if addonpos then
-                    local addonname = ACP:SpecialCaseName(GetAddOnInfo(addonpos))
+                    local addonname = ACP:SpecialCaseName(C_AddOns.GetAddOnInfo(addonpos))
                     if (addonname == addon) then table.remove(currPos, #currPos) end
                     table.insert(list, t_)
                     currPos = t_
@@ -1176,9 +1176,9 @@ function ACP:EnableAddon(addon, shift, ctrl)
     if ctrl then nochildren = not nochildren end
 
     if norecurse then
-        EnableAddOn(addon, UnitName("player"))
+        C_AddOns.EnableAddOn(addon, UnitName("player"))
     else
-        local name = GetAddOnInfo(addon)
+        local name = C_AddOns.GetAddOnInfo(addon)
         ACP_EnableRecurse(name, nochildren)
     end
 end
@@ -1197,7 +1197,7 @@ function ACP:ReadDependencies(t, ...)
 end
 
 function ACP:EnableDependencies(addon)
-    local deps = self:ReadDependencies(acquire(), GetAddOnDependencies(addon))
+    local deps = self:ReadDependencies(acquire(), C_AddOns.GetAddOnDependencies(addon))
 
     if next(deps) then
         for k in pairs(deps) do
@@ -1268,9 +1268,9 @@ function ACP:SaveSet(set)
     addonSet.name = setName
 
     local name, enabled, _
-    for i=1,GetNumAddOns() do
-        name =  GetAddOnInfo(i)
-        enabled = GetAddOnEnableState(UnitName("player"), name) > 0;
+    for i=1,C_AddOns.GetNumAddOns() do
+        name =  C_AddOns.GetAddOnInfo(i)
+        enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), name) > 0;
 
         if enabled and name ~= ACP_ADDON_NAME and not ACP:IsAddOnProtected(name) then
             table.insert(addonSet, name)
@@ -1305,10 +1305,10 @@ function ACP:UnloadSet(set)
     end
 
     local name
-    for i=1,GetNumAddOns() do
-        name = GetAddOnInfo(i)
+    for i=1,C_AddOns.GetNumAddOns() do
+        name = C_AddOns.GetAddOnInfo(i)
         if name ~= ACP_ADDON_NAME and ACP:FindAddon(list, name) and not ACP:IsAddOnProtected(name) then
-            DisableAddOn(name, UnitName("player"))
+            C_AddOns.DisableAddOn(name, UnitName("player"))
         end
     end
 
@@ -1334,8 +1334,8 @@ function ACP:LoadSet(set)
 
     enabledList = acquire()
     local name
-    for i=1,GetNumAddOns() do
-        name = GetAddOnInfo(i)
+    for i=1,C_AddOns.GetNumAddOns() do
+        name = C_AddOns.GetAddOnInfo(i)
         if ACP:FindAddon(list, name) and not ACP:IsAddOnProtected(name) then
             self:EnableAddon(name)
         end
@@ -1350,14 +1350,14 @@ function ACP:LoadSet(set)
 end
 
 function ACP:IsAddOnProtected(addon)
-    addon = GetAddOnInfo(addon)
+    addon = C_AddOns.GetAddOnInfo(addon)
     if addon and savedVar.ProtectedAddons then
         return savedVar.ProtectedAddons[addon]
     end
 end
 
 function ACP:Security_OnClick(addon)
-    addon = GetAddOnInfo(addon)
+    addon = C_AddOns.GetAddOnInfo(addon)
     if addon then
         savedVar.ProtectedAddons = savedVar.ProtectedAddons or {
             ["ACP"] = true
@@ -1369,7 +1369,7 @@ function ACP:Security_OnClick(addon)
             savedVar.ProtectedAddons[addon] = true
         end
 
-        EnableAddOn(addon, UnitName("player"))
+        C_AddOns.EnableAddOn(addon, UnitName("player"))
     end
     self:AddonList_OnShow()
 end
@@ -1467,11 +1467,11 @@ function ACP:SortDropDown_OnClick(sorter)
 end
 
 function ACP:DisableAllAddons()
-    DisableAllAddOns(UnitName("player"))
-    EnableAddOn(ACP_ADDON_NAME, UnitName("player"))
+    C_AddOns.DisableAllAddOns(UnitName("player"))
+    C_AddOns.EnableAddOn(ACP_ADDON_NAME, UnitName("player"))
 
     for k in pairs(savedVar.ProtectedAddons) do
-        EnableAddOn(k, UnitName("player"))
+        C_AddOns.EnableAddOn(k, UnitName("player"))
     end
     ACP:Print("Disabled all addons (except ACP & protected)")
     if _G[ACP_FRAME_NAME]:IsShown() then
@@ -1546,7 +1546,7 @@ function ACP:AddonList_Enable(addonIndex, enabled, shift, ctrl, category)
             reclaim(enabledList)
             enabledList = nil
         else
-            DisableAddOn(addonIndex, UnitName("player"))
+            C_AddOns.DisableAddOn(addonIndex, UnitName("player"))
         end
 
         if category and collapsedAddons[category] then
@@ -1556,7 +1556,7 @@ function ACP:AddonList_Enable(addonIndex, enabled, shift, ctrl, category)
                 if enabled then
                     self:EnableAddon(v, shift, ctrl)
                 else
-                    DisableAddOn(v, UnitName("player"))
+                    C_AddOns.DisableAddOn(v, UnitName("player"))
                 end
             end
         end
@@ -1579,7 +1579,7 @@ function ACP:AddonList_OnShow_Fast(this)
     end
 
     local obj
-    local origNumAddons = GetNumAddOns()
+    local origNumAddons = C_AddOns.GetNumAddOns()
     local numAddons = #sortedAddonList
     FauxScrollFrame_Update(ACP_AddonList_ScrollFrame, numAddons, ACP_MAXADDONS, ACP_LINEHEIGHT, nil, nil, nil)
 
@@ -1661,25 +1661,25 @@ function ACP:AddonList_OnShow_Fast(this)
                 local  name, title, notes, loadable, reason, security, newVersion
                 if (addonIdx > origNumAddons) then
                     name = ACP_BLIZZARD_ADDONS[(addonIdx - origNumAddons)]
-                    name, title, notes, loadable, reason, security, newVersion  = GetAddOnInfo(name)
+                    name, title, notes, loadable, reason, security, newVersion  = C_AddOns.GetAddOnInfo(name)
                     --					obj.addon = name
                     --					title = L[name]
                     --					notes = ""
                     --					enabled = 1
                     --					loadable = 1
-                    --					if (IsAddOnLoaded(name)) then
+                    --					if (C_AddOns.IsAddOnLoaded(name)) then
                     --						reason = "LOADED"
                     --						loadable = 1
                     --					end
                     --					security = "SECURE"
                     obj.addon = name
                 else
-                    name, title, notes, loadable, reason, security, newVersion  = GetAddOnInfo(addonIdx)
+                    name, title, notes, loadable, reason, security, newVersion  = C_AddOns.GetAddOnInfo(addonIdx)
                     obj.addon = addonIdx
                 end
-                local enabled = GetAddOnEnableState(UnitName("player"), name) > 0;
-                local loaded = IsAddOnLoaded(name)
-                local ondemand = IsAddOnLoadOnDemand(name)
+                local enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), name) > 0;
+                local loaded = C_AddOns.IsAddOnLoaded(name)
+                local ondemand = C_AddOns.IsAddOnLoadOnDemand(name)
                 if enabled and (loadable or loaded) then
                     titleText:SetTextColor(1, 0.78, 0)
                 elseif (enabled and reason ~= "DEP_DISABLED" and reason ~= "DEMAND_LOADED") then
@@ -1944,17 +1944,17 @@ end
 function ACP:ShowTooltip(this, index)
     if not index then return end
 
-    if type(index) == "number" and (index > GetNumAddOns()) then
-        index = ACP_BLIZZARD_ADDONS[(index - GetNumAddOns())]
+    if type(index) == "number" and (index > C_AddOns.GetNumAddOns()) then
+        index = ACP_BLIZZARD_ADDONS[(index - C_AddOns.GetNumAddOns())]
     end
 
     if not index then return end
 
-    local name, title, notes, loadable, reason, security, newVersion  = GetAddOnInfo(index)
+    local name, title, notes, loadable, reason, security, newVersion  = C_AddOns.GetAddOnInfo(index)
     local author = GetAddOnMetadata(name, "Author")
     local version = ParseVersion(GetAddOnMetadata(name, "Version"))
     local deps = {
-        GetAddOnDependencies(index)
+        C_AddOns.GetAddOnDependencies(index)
     }
 
     GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT")
@@ -1995,8 +1995,8 @@ function ACP:ShowTooltip(this, index)
         GameTooltip:AddLine(depLine, 1, 1, 1, 1)
     end
 
-    if GetAddOnOptionalDependencies then
-        local optionalDeps = { GetAddOnOptionalDependencies(name) }
+    if C_AddOns.GetAddOnOptionalDependencies then
+        local optionalDeps = { C_AddOns.GetAddOnOptionalDependencies(name) }
         if #optionalDeps > 0 then
             local dep_ = optionalDeps[1]
             if dep_ then
@@ -2090,7 +2090,7 @@ local function iterate_over(...)
     for i=1,select("#", ...) do
         local x = select(i, ...)
         if x and x:len() > 0 then
-            EnableAddOn(x, UnitName("player"))
+            C_AddOns.EnableAddOn(x, UnitName("player"))
         end
     end
 end
@@ -2106,18 +2106,18 @@ local function recursive_iterate_over(sink, ...)
 end
 
 local function enable_lod_dependants(addon)
-    local addon_name, title, notes, loadable, reason, security, newVersion = GetAddOnInfo(addon)
+    local addon_name, title, notes, loadable, reason, security, newVersion = C_AddOns.GetAddOnInfo(addon)
 
     -- dont do this for FuBar, its annoying
     if addon_name == "FuBar" then
         return
     end
 
-    for i=1,GetNumAddOns() do
-        local name = GetAddOnInfo(i)
-        local enabled = GetAddOnEnableState(UnitName("player"), GetAddOnInfo(name)) > 0;
-        local isdep = find_iterate_over(addon_name, GetAddOnDependencies(name))
-        local ondemand = IsAddOnLoadOnDemand(name)
+    for i=1,C_AddOns.GetNumAddOns() do
+        local name = C_AddOns.GetAddOnInfo(i)
+        local enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), C_AddOns.GetAddOnInfo(name)) > 0;
+        local isdep = find_iterate_over(addon_name, C_AddOns.GetAddOnDependencies(name))
+        local ondemand = C_AddOns.IsAddOnLoadOnDemand(name)
 
 --        if not isdep then
 --            local metaXEmbeds = GetAddOnMetadata(name, "X-Embeds")
@@ -2135,10 +2135,10 @@ end
 
 local function enableFunc(x) ACP_EnableRecurse(x, true) end
 
-local function enableIfLodFunc(x) if IsAddOnLoadOnDemand(x) then ACP_EnableRecurse(x, true) end end
+local function enableIfLodFunc(x) if C_AddOns.IsAddOnLoadOnDemand(x) then ACP_EnableRecurse(x, true) end end
 
 function ACP_EnableRecurse(name, skip_children)
-    local enabled = GetAddOnEnableState(UnitName("player"), GetAddOnInfo(name)) > 0;
+    local enabled = C_AddOns.GetAddOnEnableState(UnitName("player"), C_AddOns.GetAddOnInfo(name)) > 0;
     if enabled then
         return
 
@@ -2147,16 +2147,16 @@ function ACP_EnableRecurse(name, skip_children)
     if (type(name) == "string" and strlen(name) > 0) or
         (type(name) == "number" and name > 0) then
 
-        EnableAddOn(name, UnitName("player"))
+        C_AddOns.EnableAddOn(name, UnitName("player"))
 
         if not skip_children then
             enable_lod_dependants(name)
         end
 
-        recursive_iterate_over(enableFunc, GetAddOnDependencies(name))
-        if GetAddOnOptionalDependencies then
-            recursive_iterate_over(enableFunc, GetAddOnOptionalDependencies(name))
---            recursive_iterate_over(enableIfLodFunc, GetAddOnOptionalDependencies(name))
+        recursive_iterate_over(enableFunc, C_AddOns.GetAddOnDependencies(name))
+        if C_AddOns.GetAddOnOptionalDependencies then
+            recursive_iterate_over(enableFunc, C_AddOns.GetAddOnOptionalDependencies(name))
+--            recursive_iterate_over(enableIfLodFunc, C_AddOns.GetAddOnOptionalDependencies(name))
         end
     else
     --    self:Print(L["Addon <%s> not valid"]:format(tostring(name)))
