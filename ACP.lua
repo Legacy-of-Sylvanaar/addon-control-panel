@@ -21,12 +21,29 @@ local isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
 local isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
 local isBCC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
 local isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
+local isWrath = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
 
 local GetAddOnMetadata_Orig = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 
 local function GetAddOnMetadata(name, tag)
     local retOK, ret1 = pcall(GetAddOnMetadata_Orig, name, tag)
     if (retOK) then return ret1 end
+end
+
+local EnableAddOn = C_AddOns and C_AddOns.EnableAddOn or EnableAddOn
+local DisableAddOn = C_AddOns and C_AddOns.DisableAddOn or DisableAddOn
+local GetAddOnDependencies = C_AddOns and C_AddOns.GetAddOnDependencies or GetAddOnDependencies
+local GetAddOnOptionalDependencies = C_AddOns and C_AddOns.GetAddOnOptionalDependencies or GetAddOnOptionalDependencies
+local GetNumAddOns = C_AddOns and C_AddOns.GetNumAddOns or GetNumAddOns
+local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo or GetAddOnInfo
+local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local IsAddOnLoadOnDemand = C_AddOns and C_AddOns.IsAddOnLoadOnDemand or IsAddOnLoadOnDemand
+local GetAddOnEnableState = GetAddOnEnableState
+if not GetAddOnEnableState then
+	-- Args are flipped in The War Within
+	GetAddOnEnableState = function(character, name)
+		return C_AddOns.GetAddOnEnableState(name, character);
+	end
 end
 
 -- Handle various annoying special case names
@@ -270,7 +287,7 @@ function ACP:IsAddonCompatibleWithCurrentIntefaceVersion(addon)
         return true -- Get to the choppa!
     end
 
-	local slug = isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or ""
+	local slug = isClassic and "-Classic" or isBCC and "-BCC" or isWrath and "-Wrath" or isCata and "-Cata" or ""
 	local max_supported = (GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX .. slug)) or
 		(GetAddOnMetadata(addonnum, ACP.TAGS.INTERFACE_MAX_ORG .. slug))
 	if not max_supported then
@@ -709,11 +726,29 @@ function ACP:OnEvent(this, event, arg1, arg2, arg3)
         this:UnregisterEvent("PLAYER_ENTERING_WORLD")
         this:RegisterEvent("PLAYER_ALIVE")
 
-        GameMenuButtonAddons:SetScript("OnClick", function()
-            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
-            HideUIPanel(GameMenuFrame);
-            ShowUIPanel(ACP_AddonList);
-        end)
+        if GameMenuButtonAddons then
+			GameMenuButtonAddons:SetScript("OnClick", function()
+				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
+				HideUIPanel(GameMenuFrame);
+				ShowUIPanel(ACP_AddonList);
+			end)
+        else
+			-- Game menu buttons are no longer persistent. Must be hooked every time the game menu is opened.
+			hooksecurefunc(GameMenuFrame, 'Layout', function()
+				for button in GameMenuFrame.buttonPool:EnumerateActive() do
+					local text = button:GetText()
+
+					-- Locate the "Addons" button and hook it.
+					if (text == _G["ADDONS"]) then
+						button:SetScript("OnClick", function()
+							PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
+							HideUIPanel(GameMenuFrame);
+							ShowUIPanel(ACP_AddonList);
+						end)
+					end
+				end
+			end)
+        end
 
     --        ACP:ProcessBugSack("session")
     end

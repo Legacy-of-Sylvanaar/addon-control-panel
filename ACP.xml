@@ -204,6 +204,7 @@
                 </Layers>
                 <Scripts>
                     <OnShow>
+						local IsAddonVersionCheckEnabled = C_AddOns and C_AddOns.IsAddonVersionCheckEnabled or IsAddonVersionCheckEnabled
                         if ( IsAddonVersionCheckEnabled() ) then
                             self:SetChecked(false);
                         else
@@ -211,6 +212,7 @@
                         end
                     </OnShow>
                     <OnClick>
+						local SetAddonVersionCheck = C_AddOns and C_AddOns.SetAddonVersionCheck or SetAddonVersionCheck
                         if (self:GetChecked()) then
                             SetAddonVersionCheck(false);
                         else
