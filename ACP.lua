@@ -706,17 +706,25 @@ function ACP:OnEvent(this, event, arg1, arg2, arg3)
             StaticPopup_Show("ACP_RELOADUI_START");
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
-        this:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        this:RegisterEvent("PLAYER_ALIVE")
+		this:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		this:RegisterEvent("PLAYER_ALIVE")
 
-        GameMenuButtonAddons:SetScript("OnClick", function()
-            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
-            HideUIPanel(GameMenuFrame);
-            ShowUIPanel(ACP_AddonList);
-        end)
+		-- Game menu buttons are no longer persistent. Must be hooked every time the game menu is opened.
+		hooksecurefunc(GameMenuFrame, 'Layout', function()
+			for button in GameMenuFrame.buttonPool:EnumerateActive() do
+				local text = button:GetText()
 
-    --        ACP:ProcessBugSack("session")
-    end
+				-- Locate the "Addons" button and hook it.
+				if (text == _G["ADDONS"]) then
+					button:SetScript("OnClick", function()
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION);
+						HideUIPanel(GameMenuFrame);
+						ShowUIPanel(ACP_AddonList);
+					end)
+				end
+			end
+		end)
+	end
 
     if event == "ADDON_LOADED" then
         ACP:ADDON_LOADED(arg1)
