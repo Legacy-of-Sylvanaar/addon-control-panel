@@ -1502,8 +1502,8 @@ function ACP:SortDropDown_OnClick(sorter)
 end
 
 function ACP:DisableAllAddons()
-    DisableAllAddOns(UnitName("player"))
-    EnableAddOn(ACP_ADDON_NAME, UnitName("player"))
+    C_AddOns.DisableAllAddOns(UnitName("player"))
+    C_AddOns.EnableAddOn(ACP_ADDON_NAME, UnitName("player"))
 
     for k in pairs(savedVar.ProtectedAddons) do
         EnableAddOn(k, UnitName("player"))
