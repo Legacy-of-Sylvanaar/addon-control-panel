@@ -32,6 +32,7 @@ end
 
 local EnableAddOn = C_AddOns and C_AddOns.EnableAddOn or EnableAddOn
 local DisableAddOn = C_AddOns and C_AddOns.DisableAddOn or DisableAddOn
+local DisableAllAddOns = C_AddOns and C_AddOns.DisableAllAddOns or DisableAllAddOns
 local GetAddOnDependencies = C_AddOns and C_AddOns.GetAddOnDependencies or GetAddOnDependencies
 local GetAddOnOptionalDependencies = C_AddOns and C_AddOns.GetAddOnOptionalDependencies or GetAddOnOptionalDependencies
 local GetNumAddOns = C_AddOns and C_AddOns.GetNumAddOns or GetNumAddOns

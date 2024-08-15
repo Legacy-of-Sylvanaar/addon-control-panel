@@ -277,6 +277,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
+						local EnableAllAddOns = C_AddOns and C_AddOns.EnableAllAddOns or EnableAllAddOns
                         EnableAllAddOns()
                         ACP:AddonList_OnShow(self)
                     </OnClick>
