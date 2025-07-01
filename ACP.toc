@@ -1,4 +1,4 @@
-## Interface: 110005, 40401, 11505
+## Interface: 110107, 40401, 11505
 
 ## Title: Addon Control Panel
 ## Author: Sylvanaar (Sylvaan - Zul'Jin/US-Horde)
