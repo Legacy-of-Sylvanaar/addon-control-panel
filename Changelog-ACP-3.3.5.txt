@@ -1,0 +1,132 @@
+------------------------------------------------------------------------
+Fork v1.0.0 | custom | 2026-07-25 (targets game version 3.3.5)
+Changed paths:
+   M /ACP.lua
+   M /ACP.xml
+   M /ACP.toc
+
+- Grouping fix: addons are now only grouped by family when there is real
+  evidence (X-Part-Of tag, known exception list, or manual override) -
+  an addon whose folder name just happens to contain "_" is no longer
+  falsely grouped with unrelated addons. Fixed a bug where names with
+  2+ underscores got truncated.
+- Added manual grouping control: /acp group <addon> <groupname>,
+  /acp ungroup <addon>, /acp groups.
+- Added a live search box to the addon list panel that filters by addon
+  folder name or title as you type.
+------------------------------------------------------------------------
+r58 | sylvanaar | 2010-09-17 17:00:30 +0000 (Fri, 17 Sep 2010) | 1 line
+Changed paths:
+   A /tags/3.3.5 (from /trunk:57)
+
+Tagging as 3.3.5
+------------------------------------------------------------------------
+r57 | sylvanaar | 2010-09-05 19:46:26 +0000 (Sun, 05 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+fixed another leaked global. removed all getglobal usages
+------------------------------------------------------------------------
+r56 | sylvanaar | 2010-09-05 19:37:06 +0000 (Sun, 05 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+fixed a leaked global
+------------------------------------------------------------------------
+r55 | sylvanaar | 2010-09-05 03:13:45 +0000 (Sun, 05 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+add a ui hint on the main page to indicate that an addon has compatiblity information. (for now just reusing blizzards locked and unlocked icon)
+------------------------------------------------------------------------
+r54 | sylvanaar | 2010-09-04 20:48:32 +0000 (Sat, 04 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+fix mispelled tag names, reversed addon status labels, and simplified tooltip text
+------------------------------------------------------------------------
+r53 | sylvanaar | 2010-09-04 20:01:40 +0000 (Sat, 04 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+   M /trunk/ACP.xml
+
+Add support for the easier to comprehend toc tags "X-Max-Interface" and "X-Min-Interface". The original tag names work also.
+------------------------------------------------------------------------
+r52 | sylvanaar | 2010-09-04 19:44:12 +0000 (Sat, 04 Sep 2010) | 1 line
+Changed paths:
+   A /trunk/.idea
+   A /trunk/.idea/ant.xml
+   A /trunk/.idea/compiler.xml
+   A /trunk/.idea/copyright
+   A /trunk/.idea/copyright/profiles_settings.xml
+   A /trunk/.idea/encodings.xml
+   A /trunk/.idea/misc.xml
+   A /trunk/.idea/modules.xml
+   A /trunk/.idea/uiDesigner.xml
+   A /trunk/.idea/vcs.xml
+   A /trunk/ACP.iml
+
+check in the IDEA project files
+------------------------------------------------------------------------
+r51 | sylvanaar | 2010-09-03 14:14:44 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+   M /trunk/ACP.toc
+
+changes to compatibility indicator which make it completely optional
+------------------------------------------------------------------------
+r50 | sylvanaar | 2010-09-02 17:57:29 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.xml
+
+move the location of the addons button from above the logout button to above the macros button. I pressed logout way too many times on accident
+------------------------------------------------------------------------
+r49 | sylvanaar | 2010-09-02 15:34:32 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+fix out of range error and mark blizzard addons as compatible
+------------------------------------------------------------------------
+r48 | sylvanaar | 2010-09-02 14:56:00 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+turn of compat checks on interface 30300 and lower
+------------------------------------------------------------------------
+r47 | sylvanaar | 2010-09-02 14:47:40 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+improved the UI for incompatible addons - so they are full red, and say incompatible
+------------------------------------------------------------------------
+r46 | sylvanaar | 2010-09-02 14:26:53 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.lua
+
+implemented a UI for compatible addons. unknown or incompatible addons are pinkish color, and the info in the tooltip says Compatible: Yes, No, or Unknown
+------------------------------------------------------------------------
+r45 | sylvanaar | 2010-09-02 14:06:39 +0000 (Thu, 02 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/ACP.toc
+
+Add new toc tag: ## X-Compatible-With: 40000  (shows the highest interface version your addon is compatible with)
+------------------------------------------------------------------------
+r44 | sylvanaar | 2010-08-28 14:34:39 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/localization-enUS.lua
+
+fix enUS error
+------------------------------------------------------------------------
+r43 | sylvanaar | 2010-08-28 14:28:52 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/localization-deDE.lua
+   M /trunk/localization-enUS.lua
+   M /trunk/localization-esES.lua
+   M /trunk/localization-frFR.lua
+   M /trunk/localization-koKR.lua
+   M /trunk/localization-ruRU.lua
+   M /trunk/localization-zhCN.lua
+   M /trunk/localization-zhTW.lua
+
+migrate localizations to the curse localization tool
+------------------------------------------------------------------------
